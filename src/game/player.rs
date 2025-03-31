@@ -2,7 +2,8 @@ use std::sync::{Arc, Mutex, Condvar};
 
 use crate::game::card::Card;
 
-pub fn create_player(player_id : i32, round : Arc<(Mutex<i32>, Condvar)>, hand : Vec<Card>, field : Vec<Card>) {
+#[warn(unused_variables)]
+pub fn create_player(player_id : i32, round : Arc<(Mutex<i32>, Condvar)>, _hand : Vec<Card>, _field : Vec<Card>) {
     let (turn_lock, cvar) = &*round;
     // let mut curr_game_round = *turn_lock.lock().unwrap();
     let mut player_game_round = 1;
