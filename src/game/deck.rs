@@ -55,7 +55,7 @@ impl Deck {
             Card::Maki                                      => self.add_card(card, SUSHI_ROLLS_COUNT),
             Card::Tempura | Card::Sashimi | Card::MisoSoup  => self.add_card(card, APPETIZERS_COUNT ),
             Card::Wasabi | Card::Tea                        => self.add_card(card, SPECIALS_COUNT   ),
-            Card::GreeTeaIceCream                           => self.add_card(card, DESSERTS_COUNT   ),
+            Card::GreenTeaIceCream                           => self.add_card(card, DESSERTS_COUNT   ),
             // _                                               => println!("Card Not Supported Yet"),
         }
     }

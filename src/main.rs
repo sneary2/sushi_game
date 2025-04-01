@@ -1,6 +1,7 @@
 use std::thread::{self};
 
 use std::sync::{Arc, Mutex, Condvar};
+use std::time::Duration;
 // use std::thread;
 
 mod game;
@@ -35,14 +36,19 @@ fn main() {
         handles.push(thread::spawn(move || game::player::create_player(player_id, round, hand, field)));
     }
 
-    {
-        let (turn_lock, cvar) = &*round;
-        let mut turn: std::sync::MutexGuard<'_, i32> = turn_lock.lock().unwrap();
-        *turn += 1;
-        println!("Main: Updated turn to {turn}");
-        cvar.notify_all();
+    for _ in 0..=9 {
+        { 
+            let (turn_lock, cvar) = &*round;
+            let mut turn: std::sync::MutexGuard<'_, i32> = turn_lock.lock().unwrap();
+            *turn += 1;
+            println!("Main: Updated turn to {turn}");
+            cvar.notify_all();
+        }
+        thread::sleep(Duration::from_secs(2));
     }
+
     for handle in handles {
         handle.join().unwrap();
     }
+
 }
