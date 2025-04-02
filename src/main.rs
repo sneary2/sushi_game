@@ -1,7 +1,6 @@
 use std::thread::{self};
 
-use std::sync::{Arc, Mutex, Condvar};
-use std::time::Duration;
+use std::sync::{Arc, Mutex, Barrier};
 // use std::thread;
 
 mod game;
@@ -9,11 +8,14 @@ use game::card::Card;
 use game::deck::Deck;
 use game::deck::Setup;
 
+const NUM_PLAYERS : usize = 4;
+const HAND_SIZE: usize = 9;
+
 fn main() {
     println!("Start Game!");
 
     let deck: Arc<Mutex<Deck>> = Arc::new(Mutex::new(Deck::new(Setup::MY_FIRST_MEAL)));
-    let round: Arc<(Mutex<i32>, Condvar)> = Arc::new((Mutex::new(0), Condvar::new()));
+    let turn_barrier: Arc<Barrier> =  Arc::new(Barrier::new(NUM_PLAYERS + 1)); // 4 players
 
     {
         deck.lock().unwrap().shuffle();
@@ -21,30 +23,24 @@ fn main() {
 
     let mut handles: Vec<thread::JoinHandle<()>> = Vec::new();
 
-    for player_id in 0..=3 {
-
-        let round: Arc<(Mutex<i32>, Condvar)> = round.clone();
-
+    for player_id in 0..NUM_PLAYERS {
 
         let hand: Vec<Card>;
         {
-            hand = deck.lock().unwrap().draw(9);
+            hand = deck.lock().unwrap().draw(HAND_SIZE);
         } 
 
         let field : Vec<Card> = Vec::with_capacity(9);
 
-        handles.push(thread::spawn(move || game::player::create_player(player_id, round, hand, field)));
+        let barrier_clone = Arc::clone(&turn_barrier);
+
+        handles.push(thread::spawn(move || game::player::create_player(player_id, barrier_clone, hand, field)));
     }
 
-    for _ in 0..=9 {
-        { 
-            let (turn_lock, cvar) = &*round;
-            let mut turn: std::sync::MutexGuard<'_, i32> = turn_lock.lock().unwrap();
-            *turn += 1;
-            println!("Main: Updated turn to {turn}");
-            cvar.notify_all();
-        }
-        thread::sleep(Duration::from_secs(2));
+
+    for round_no in 1..=9 {
+        // println!("=== Round {round_no} Start!");
+        turn_barrier.wait();      
     }
 
     for handle in handles {
