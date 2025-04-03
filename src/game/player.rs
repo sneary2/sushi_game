@@ -1,17 +1,20 @@
-use std::sync::{Arc, Barrier, Condvar, Mutex};
+use std::sync::{Arc, Barrier, Mutex};
 
 use crate::game::card::Card;
 
 #[warn(unused_variables)]
-pub fn create_player(player_id : usize, turn_barrier: Arc<Barrier>, mut hand : Vec<Card>, _field : Vec<Card>) {
+pub fn create_player(player_id : usize, turn_barrier: Arc<Barrier>, hand : Arc<Mutex<Vec<Card>>>, _field : Vec<Card>) {
 
     let mut turn_no: i32 = 0;
     println!("Player {player_id}:  Turn is {turn_no}");
     
-    while hand.is_empty() == false {
+    while hand.lock().unwrap().is_empty() == false {
+        turn_barrier.wait();
         turn_barrier.wait();
 
-        let card = hand.pop().unwrap();
+        let mut player_hand: std::sync::MutexGuard<'_, Vec<Card>> = hand.lock().unwrap();
+
+        let card = player_hand.pop().unwrap();
 
         turn_no = turn_no+1;
         println!("Player {player_id} on round {turn_no}: Player {player_id} plays {card}")
