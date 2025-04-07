@@ -20,7 +20,7 @@ fn main() {
         deck.lock().unwrap().shuffle();
     }
 
-    let mut handles: Vec<thread::JoinHandle<()>> = Vec::with_capacity(NUM_PLAYERS);
+    let mut handles: Vec<thread::JoinHandle<(usize, Vec<Card>)>> = Vec::with_capacity(NUM_PLAYERS);
     let mut hands : Vec<Arc<Mutex<Vec<Card>>>> = Vec::with_capacity(NUM_PLAYERS);
 
     for player_id in 0..NUM_PLAYERS {
@@ -33,7 +33,7 @@ fn main() {
 
         let field : Vec<Card> = Vec::with_capacity(9);
 
-        let barrier_clone = Arc::clone(&turn_barrier);
+        let barrier_clone: Arc<Barrier> = Arc::clone(&turn_barrier);
 
         handles.push(thread::spawn(move || game::player::create_player(player_id, barrier_clone, hand, field)));
     }
@@ -43,20 +43,25 @@ fn main() {
         turn_barrier.wait();
         println!("=== Round {round_no} Start!");
 
-        // Rotate the hands
         rotate_hands(&hands);
 
         turn_barrier.wait();
     }
 
+    let mut end_board: Vec<(usize, Vec<Card>)> = Vec::with_capacity(NUM_PLAYERS);
     for handle in handles {
-        handle.join().unwrap();
+        let (player_id, played_cards) = handle.join().unwrap();
+
+        println!("Player {player_id} played {played_cards:?}");
+
+        end_board.push((player_id, played_cards));
     }
+
 
 }
 
 fn rotate_hands(hands : &Vec<Arc<Mutex<Vec<Card>>>>) {
-    let mut temp_hands : Vec<Vec<Card>> = hands.iter().map(|hand| hand.lock().unwrap().clone()).collect();
+    let mut temp_hands : Vec<Vec<Card>> = hands.iter().map(|hand: &Arc<Mutex<Vec<Card>>>| hand.lock().unwrap().clone()).collect();
 
     temp_hands.rotate_right(1);
 

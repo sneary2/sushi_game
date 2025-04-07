@@ -1,7 +1,7 @@
 use std::fmt;
 
 #[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Card {
     Nigiri,
     Maki,
@@ -29,3 +29,34 @@ impl fmt::Display for Card {
         write!(f, "{}", card_name)
     }
 }
+
+// impl Card {
+//     pub fn score(&self, count: u32) -> i32 {
+//         match self {
+//             Card::Nigiri => {
+                
+//             },
+//             Card::Maki => {
+
+//             },
+//             Card::Tempura => {
+
+//             },
+//             Card::Sashimi => {
+
+//             },
+//             Card::MisoSoup => {
+
+//             },
+//             Card::Wasabi => {
+
+//             },
+//             Card::Tea => {
+
+//             },
+//             Card::GreenTeaIceCream => {
+
+//             }
+//         }
+//     }
+// }
