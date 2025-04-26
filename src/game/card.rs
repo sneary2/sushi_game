@@ -29,3 +29,41 @@ impl fmt::Display for Card {
         write!(f, "{}", card_name)
     }
 }
+
+pub fn score_Nigiri(scores: &mut Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+    for (id, board) in end_boards {
+        for card in board {
+            if card.eq(&Card::Nigiri) {
+                scores[*id] += 1;
+            }
+        }
+    }
+}
+
+pub fn score_Maki(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+
+}
+
+pub fn score_Tempura(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+
+}
+
+pub fn score_Sashimi(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+
+}
+
+pub fn score_MisoSoup(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+
+}
+
+pub fn score_Wasabi(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+
+}
+
+pub fn score_Tea(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+
+}
+
+pub fn score_GreenTeaIceCream(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+
+} 

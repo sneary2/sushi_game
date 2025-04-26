@@ -1,9 +1,10 @@
+use std::iter::Enumerate;
 use std::thread::{self};
 
 use std::sync::{Arc, Mutex, Barrier};
 
 mod game;
-use game::card::Card;
+use game::card::{score_GreenTeaIceCream, score_Maki, score_MisoSoup, score_Nigiri, score_Sashimi, score_Tea, score_Tempura, score_Wasabi, Card};
 use game::deck::Deck;
 use game::deck::Setup;
 
@@ -48,15 +49,33 @@ fn main() {
         turn_barrier.wait();
     }
 
-    let mut end_board: Vec<(usize, Vec<Card>)> = Vec::with_capacity(NUM_PLAYERS);
+    let mut end_boards: Vec<(usize, Vec<Card>)> = Vec::with_capacity(NUM_PLAYERS);
     for handle in handles {
         let (player_id, played_cards) = handle.join().unwrap();
 
         println!("Player {player_id} played {played_cards:?}");
 
-        end_board.push((player_id, played_cards));
+        end_boards.push((player_id, played_cards));
     }
+    let mut scores: Vec<u32> = vec![0; 4];
 
+    score_Nigiri(&mut scores, &end_boards);
+    score_Maki(&mut scores, &end_boards);
+    score_Tempura(&mut scores, &end_boards);
+    score_Sashimi(&mut scores, &end_boards);
+    score_MisoSoup(&mut scores, &end_boards);
+    score_Wasabi(&mut scores, &end_boards);
+    score_Tea(&mut scores, &end_boards);
+    score_GreenTeaIceCream(&mut scores, &end_boards);
+
+    let player_ids: Vec<_> = (1..=4).collect();
+    let mut player_scores: Vec<_> = player_ids.into_iter().zip(scores).collect();
+
+    player_scores.sort_by(|p1,p2| p2.1.cmp(&p1.1));
+
+    for (player_id, score) in player_scores {
+        println!("Player {player_id} scored {score}");
+    }
 
 }
 
