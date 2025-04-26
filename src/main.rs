@@ -1,4 +1,3 @@
-use std::iter::Enumerate;
 use std::thread::{self};
 
 use std::sync::{Arc, Mutex, Barrier};
