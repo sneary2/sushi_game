@@ -6,6 +6,7 @@ mod game;
 use game::card::{score_GreenTeaIceCream, score_Maki, score_MisoSoup, score_Nigiri, score_Sashimi, score_Tea, score_Tempura, score_Wasabi, Card};
 use game::deck::Deck;
 use game::deck::Setup;
+use game::player;
 
 const NUM_PLAYERS : usize = 4;
 const HAND_SIZE: usize = 9;
@@ -52,16 +53,19 @@ fn main() {
     for handle in handles {
         let (player_id, played_cards) = handle.join().unwrap();
 
-        println!("Player {player_id} played {played_cards:?}");
+        // println!("Player {player_id} played {played_cards:?}");
 
         end_boards.push((player_id, played_cards));
     }
-    let mut scores: Vec<u32> = vec![0; 4];
 
-    score_Nigiri(&mut scores, &end_boards);
-    score_Maki(&mut scores, &end_boards);
-    score_Tempura(&mut scores, &end_boards);
-    score_Sashimi(&mut scores, &end_boards);
+    print_board(&end_boards);
+
+    let mut scores: Vec<usize> = vec![0; 4];
+
+    // score_Nigiri(&mut scores, &end_boards);
+    // score_Maki(&mut scores, &end_boards);
+    // score_Tempura(&mut scores, &end_boards);
+    // score_Sashimi(&mut scores, &end_boards);
     score_MisoSoup(&mut scores, &end_boards);
     score_Wasabi(&mut scores, &end_boards);
     score_Tea(&mut scores, &end_boards);
@@ -86,4 +90,32 @@ fn rotate_hands(hands : &Vec<Arc<Mutex<Vec<Card>>>>) {
     for (i, hand) in hands.iter().enumerate() {
         *hand.lock().unwrap() = temp_hands[i].clone();
     }
+}
+
+fn print_board(end_boards: &Vec<(usize, Vec<Card>)>) {
+    println!("+-----------------------------------------------+");
+
+    print!("| ");
+    for (id, _) in end_boards {
+        let card = format!("Player {}", id);
+        print!("{card:9}");
+        print!(" | ");
+    }
+    println!("");
+
+    for row in 0..HAND_SIZE {
+        println!("+-----------------------------------------------+");
+        print_table_row(end_boards, row);
+    }
+    println!("+-----------------------------------------------+");
+}
+
+fn print_table_row(end_boards: &Vec<(usize, Vec<Card>)>, row: usize) {
+    print!("| ");
+    for (_, cards) in end_boards {
+        let card = format!("{:9}", &cards[row].to_string());
+        print!("{card}");
+        print!(" | ");
+    }
+    println!("");
 }

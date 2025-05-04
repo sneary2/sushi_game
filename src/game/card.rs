@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::NUM_PLAYERS;
+use crate::{HAND_SIZE, NUM_PLAYERS};
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -34,23 +34,22 @@ impl fmt::Display for Card {
 
 
 #[allow(non_snake_case)]
-pub fn score_Nigiri(scores: &mut Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+pub fn score_Nigiri(scores: &mut Vec<usize>, end_boards: &Vec<(usize, Vec<Card>)>) {
     for (id, board) in end_boards {
         for card in board {
             if card.eq(&Card::Nigiri) {
-                scores[*id] += 0;
+                scores[*id] += 1;
             }
         }
     }
 }
 
 #[allow(non_snake_case)]
-pub fn score_Maki(scores: &mut Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
-    let maki_counts: Vec<(_, _)> = end_boards.iter().map(|(id, cards)| (id, count_cards(Card::Maki, cards))).collect();
+pub fn score_Maki(scores: &mut Vec<usize>, end_boards: &Vec<(usize, Vec<Card>)>) {
+    let maki_counts: Vec<(&usize, usize)> = end_boards.iter().map(|(id, cards)| (id, count_cards(Card::Maki, cards))).collect();
 
     println!("maki_counts: {maki_counts:?}");
 
-    // end_boards.sort_by(|a, b: &(usize, Vec<Card>)| b.1.iter().filter(|&card| card.eq(&Card::Maki)).count().cmp(&a.1.iter().filter(|&card| card.eq(&Card::Maki)).count()));
     let most_maki = maki_counts[0].1;
     let mut idx = 0;
     while idx < NUM_PLAYERS && maki_counts[idx].1 == most_maki {
@@ -64,45 +63,63 @@ pub fn score_Maki(scores: &mut Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
             idx += 1;
         }
     }
-
-    // let first_player_id  = maki_counts[0].0;
-    // let second_player_id = end_boards[1].0;
-    // println!("Player with        most Maki is {first_player_id}");
-    // println!("Player with second most Maki is {second_player_id}");
-    // scores[first_player_id]  += 6;
-    // scores[second_player_id] += 3;
 }
 
 #[allow(non_snake_case)]
-pub fn score_Tempura(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+pub fn score_Tempura(scores: &mut Vec<usize>, end_boards: &Vec<(usize, Vec<Card>)>) {
+    let tempura_counts: Vec<(&usize, usize)> = end_boards.iter().map(|(id, cards)| (id, count_cards(Card::Tempura, cards))).collect();
+
+    for (id, tempura_count) in tempura_counts {
+        scores[*id] += (tempura_count / 2) * 5;
+    }
+}
+
+#[allow(non_snake_case)]
+pub fn score_Sashimi(scores: &mut Vec<usize>, end_boards: &Vec<(usize, Vec<Card>)>) {
+    let sashimi_counts: Vec<(&usize, usize)> = end_boards.iter().map(|(id, cards)| (id, count_cards(Card::Sashimi, cards))).collect();
+
+    for (id, tempura_count) in sashimi_counts {
+        scores[*id] += (tempura_count / 3) * 10;
+    }
+}
+
+#[allow(non_snake_case)]
+pub fn score_MisoSoup(scores: &mut Vec<usize>, end_boards: &Vec<(usize, Vec<Card>)>) {
+    'round_loop: for round in 0..HAND_SIZE {
+        let mut miso_played: bool = false;
+        let mut id_won_miso: usize = 4096;
+        for (player_id, cards) in end_boards {
+            if cards[round].eq(&Card::MisoSoup) {
+                if miso_played {
+                    // Miso Soup has already been played, no points awarded, moving to next loop
+                    continue 'round_loop;
+                }
+                id_won_miso = *player_id;
+                miso_played = true;
+            }
+        }
+        if miso_played == true {
+            scores[id_won_miso] += 3;
+        }
+    }
+}
+
+#[allow(non_snake_case)]
+pub fn score_Wasabi(scores: &mut Vec<usize>, end_boards: &Vec<(usize, Vec<Card>)>) {
+    
+}
+
+#[allow(non_snake_case)]
+pub fn score_Tea(scores: &mut Vec<usize>, end_boards: &Vec<(usize, Vec<Card>)>) {
 
 }
 
 #[allow(non_snake_case)]
-pub fn score_Sashimi(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
-
-}
-
-#[allow(non_snake_case)]
-pub fn score_MisoSoup(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
-
-}
-
-#[allow(non_snake_case)]
-pub fn score_Wasabi(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
-
-}
-
-#[allow(non_snake_case)]
-pub fn score_Tea(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
-
-}
-
-#[allow(non_snake_case)]
-pub fn score_GreenTeaIceCream(scores: &Vec<u32>, end_boards: &Vec<(usize, Vec<Card>)>) {
+pub fn score_GreenTeaIceCream(scores: &mut Vec<usize>, end_boards: &Vec<(usize, Vec<Card>)>) {
 
 } 
 
+// Counts of the number of search_card that appear in the cards vector
 fn count_cards(search_card: Card, cards : &Vec<Card>) -> usize {
     cards.iter().filter(|card| search_card.eq(card)).count()
 }
