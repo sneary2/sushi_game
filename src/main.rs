@@ -67,7 +67,7 @@ fn main() {
     score_Tea(&mut scores, &end_boards);
     score_GreenTeaIceCream(&mut scores, &end_boards);
 
-    let player_ids: Vec<_> = (1..=4).collect();
+    let player_ids: Vec<_> = (0..4).collect();
     let mut player_scores: Vec<_> = player_ids.into_iter().zip(scores).collect();
 
     player_scores.sort_by(|p1,p2| p2.1.cmp(&p1.1));
