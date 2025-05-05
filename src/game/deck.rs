@@ -3,7 +3,9 @@ use crate::game::card::Card;
 use rand::seq::SliceRandom; // For shuffling
 use rand::thread_rng; // Random number generator
 
-const NIGIRI_COUNT : u32 = 12;
+const NIGIRI_1_COUNT : u32 = 4;
+const NIGIRI_2_COUNT : u32 = 5;
+const NIGIRI_3_COUNT : u32 = 3;
 const SUSHI_ROLLS_COUNT : u32 = 12;
 const APPETIZERS_COUNT : u32 = 12;
 const SPECIALS_COUNT : u32 = 12;
@@ -33,7 +35,9 @@ impl Deck {
         let mut deck: Deck = Self{cards: Vec::new()};
         match setup {
             Setup::MY_FIRST_MEAL => {
-                deck.add_card_to_game(Card::Nigiri);
+                deck.add_card_to_game(Card::Nigiri_1);
+                deck.add_card_to_game(Card::Nigiri_2);
+                deck.add_card_to_game(Card::Nigiri_3);
                 deck.add_card_to_game(Card::Maki);
                 deck.add_card_to_game(Card::Tempura);
                 deck.add_card_to_game(Card::Sashimi);
@@ -51,11 +55,13 @@ impl Deck {
 
     pub fn add_card_to_game(&mut self, card: Card) {
         match card {
-            Card::Nigiri                                    => self.add_card(card, NIGIRI_COUNT     ),
+            Card::Nigiri_1                                  => self.add_card(card, NIGIRI_1_COUNT   ),
+            Card::Nigiri_2                                  => self.add_card(card, NIGIRI_2_COUNT   ),
+            Card::Nigiri_3                                  => self.add_card(card, NIGIRI_3_COUNT   ),
             Card::Maki                                      => self.add_card(card, SUSHI_ROLLS_COUNT),
             Card::Tempura | Card::Sashimi | Card::MisoSoup  => self.add_card(card, APPETIZERS_COUNT ),
             Card::Wasabi | Card::Tea                        => self.add_card(card, SPECIALS_COUNT   ),
-            Card::GreenTeaIceCream                           => self.add_card(card, DESSERTS_COUNT   ),
+            Card::GreenTeaIceCream                          => self.add_card(card, DESSERTS_COUNT   ),
             // _                                               => println!("Card Not Supported Yet"),
         }
     }
